@@ -2,9 +2,13 @@
 using AiChatTest.Models;
 using Microsoft.Extensions.AI;
 
-var client = ChatClientFactory.CreateChatClient(ChatType.OpenAi);
+var client = ChatClientFactory.CreateChatClient(ChatType.Ollama);
 
-var chatMessages = new List<ChatMessage>();
+var chatHistory = new List<ChatMessage>();
+var chatOptions = new ChatOptions
+{
+    Tools = ToolsProvider.GetBookTools()    
+};
 
 while (true)
 {
@@ -16,16 +20,22 @@ while (true)
         break;
     }
     
-    chatMessages.Add(new ChatMessage(ChatRole.User, prompt));
+    chatHistory.Add(new ChatMessage(ChatRole.User, prompt));
     
-    var response = string.Empty;
+    // ===== Atomic response =====
+    var response = await client.CompleteAsync(chatHistory, chatOptions);
+    chatHistory.Add(new ChatMessage(ChatRole.Assistant, response.Message.Text));
+    Console.WriteLine(response.Message.Text);
 
-    await foreach (var token in client.CompleteStreamingAsync(chatMessages))
-    {
-        Console.Write(token.Text);
-        response += token.Text;
-    }
-    chatMessages.Add(new ChatMessage(ChatRole.Assistant, response));
-    
-    Console.WriteLine();
+    // ===== Real-time response =====
+    // var response = string.Empty;
+    //
+    // await foreach (var token in client.CompleteStreamingAsync(chatHistory, chatOptions))
+    // {
+    //     Console.Write(token.Text);
+    //     response += token.Text;
+    // }
+    // chatHistory.Add(new ChatMessage(ChatRole.Assistant, response));
+    //
+    // Console.WriteLine();
 }

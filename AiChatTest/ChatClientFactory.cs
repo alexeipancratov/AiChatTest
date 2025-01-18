@@ -11,7 +11,10 @@ public static class ChatClientFactory
         switch (chatType)
         {
             case ChatType.Ollama:
-                return new OllamaChatClient(new Uri("http://localhost:11434/"), "llama3");
+                return new OllamaChatClient(new Uri("http://localhost:11434/"), "llama3.1")
+                    .AsBuilder()
+                    .UseFunctionInvocation()
+                    .Build();
             case ChatType.OpenAi:
                 return new OpenAIClient(Environment.GetEnvironmentVariable("OPENAI_API_KEY"))
                     .AsChatClient(modelId: "gpt-4o-mini");
