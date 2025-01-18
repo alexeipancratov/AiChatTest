@@ -11,6 +11,8 @@ public static class ChatClientFactory
         switch (chatType)
         {
             case ChatType.Ollama:
+                return new OllamaChatClient(new Uri("http://localhost:11434/"), "llama3.1");
+            case ChatType.OllamaWithTools:
                 return new OllamaChatClient(new Uri("http://localhost:11434/"), "llama3.1")
                     .AsBuilder()
                     .UseFunctionInvocation()

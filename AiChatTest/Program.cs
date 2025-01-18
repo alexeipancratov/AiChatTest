@@ -2,7 +2,7 @@
 using AiChatTest.Models;
 using Microsoft.Extensions.AI;
 
-var client = ChatClientFactory.CreateChatClient(ChatType.Ollama);
+var client = ChatClientFactory.CreateChatClient(ChatType.OllamaWithTools);
 
 var chatHistory = new List<ChatMessage>();
 var chatOptions = new ChatOptions
@@ -25,12 +25,12 @@ while (true)
     // ===== Atomic response =====
     var response = await client.CompleteAsync(chatHistory, chatOptions);
     chatHistory.Add(new ChatMessage(ChatRole.Assistant, response.Message.Text));
-    Console.WriteLine(response.Message.Text);
+    Console.WriteLine(response.Message.Text ?? "<no response>");
 
     // ===== Real-time response =====
     // var response = string.Empty;
     //
-    // await foreach (var token in client.CompleteStreamingAsync(chatHistory, chatOptions))
+    // await foreach (var token in client.CompleteStreamingAsync(chatHistory))
     // {
     //     Console.Write(token.Text);
     //     response += token.Text;

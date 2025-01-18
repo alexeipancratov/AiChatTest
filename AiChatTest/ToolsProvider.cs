@@ -19,18 +19,6 @@ public static class ToolsProvider
     
     public static IList<AITool> GetBookTools()
     {
-        async Task<IReadOnlyCollection<Book>> GetBooks()
-        {
-            LogToConsole("GetBooks");
-            
-            await using var connection = new SqliteConnection("Data Source=Database/books.sqlite");
-            await connection.OpenAsync();
-            var query = "SELECT Id, Name, CAST(Rating AS REAL) AS Rating FROM Books";
-            var books = await connection.QueryAsync<Book>(query);
-
-            return books.ToArray();
-        }
-
         return
         [
             AIFunctionFactory.Create(GetBooks,
@@ -40,5 +28,17 @@ public static class ToolsProvider
                     Description = "Retrieves books",
                 })
         ];
+
+        async Task<IReadOnlyCollection<Book>> GetBooks()
+        {
+            LogToConsole("GetBooks");
+            
+            await using var connection = new SqliteConnection("Data Source=Database/books.sqlite");
+            await connection.OpenAsync();
+            var query = "SELECT * FROM Books WHERE UserId = @UserId";
+            var books = await connection.QueryAsync<Book>(query, new { UserId = 100 });
+
+            return books.ToArray();
+        }
     }
 }
