@@ -22,5 +22,11 @@
         <CleanSQLiteInteropFiles>false</CleanSQLiteInteropFiles>
         <CollectSQLiteInteropFiles>false</CollectSQLiteInteropFiles>
     </PropertyGroup>
+    
+    <ItemGroup>
+        <None Update="Database\books.sqlite">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
 </Project>

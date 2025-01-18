@@ -23,7 +23,7 @@ public static class ToolsProvider
         {
             LogToConsole("GetBooks");
             
-            await using var connection = new SqliteConnection("Data Source=/Users/alexeipancratov/Documents/databases/books.sqlite");
+            await using var connection = new SqliteConnection("Data Source=Database/books.sqlite");
             await connection.OpenAsync();
             var query = "SELECT Id, Name, CAST(Rating AS REAL) AS Rating FROM Books";
             var books = await connection.QueryAsync<Book>(query);
