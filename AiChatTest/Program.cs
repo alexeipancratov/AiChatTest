@@ -1,13 +1,19 @@
 ﻿using AiChatTest;
 using AiChatTest.Models;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.DependencyInjection;
+
+// Configure DI container
+var serviceProvider = new ServiceCollection()
+    .AddHttpClient<ToolsProvider>()
+    .Services.BuildServiceProvider();
 
 var client = ChatClientFactory.CreateChatClient(ChatType.OllamaWithTools);
 
 var chatHistory = new List<ChatMessage>();
 var chatOptions = new ChatOptions
 {
-    Tools = ToolsProvider.GetBookTools()    
+    Tools = serviceProvider.GetRequiredService<ToolsProvider>().GetBookTools()
 };
 
 while (true)
@@ -26,6 +32,14 @@ while (true)
     var response = await client.CompleteAsync(chatHistory, chatOptions);
     chatHistory.Add(new ChatMessage(ChatRole.Assistant, response.Message.Text));
     Console.WriteLine(response.Message.Text ?? "<no response>");
+
+    // Potential fix for "call_id" issue
+    if (response.Message.Text != null && response.Message.Text.Contains("call_id"))
+    {
+        response = await client.CompleteAsync(chatHistory, chatOptions);
+        chatHistory.Add(new ChatMessage(ChatRole.Assistant, response.Message.Text));
+        Console.WriteLine(response.Message.Text ?? "<no response>");
+    }
 
     // ===== Real-time response =====
     // var response = string.Empty;
