@@ -18,8 +18,14 @@ while (true)
     
     chatMessages.Add(new ChatMessage(ChatRole.User, prompt));
     
-    var response = await client.CompleteAsync(chatMessages);
-    chatMessages.Add(new ChatMessage(ChatRole.Assistant, response.Message.Text));
+    var response = string.Empty;
 
-    Console.WriteLine(response.Message);
+    await foreach (var token in client.CompleteStreamingAsync(chatMessages))
+    {
+        Console.Write(token.Text);
+        response += token.Text;
+    }
+    chatMessages.Add(new ChatMessage(ChatRole.Assistant, response));
+    
+    Console.WriteLine();
 }
